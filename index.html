@@ -7,33 +7,32 @@
   <style>
     body{font-family:Arial, sans-serif; margin:20px; line-height:1.4}
 
-    header{display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:18px}
     .logo{height:90px; width:auto; flex-shrink:0;}
     input[type="search"]{padding:10px 12px; border:1px solid #ccc; border-radius:10px; min-width:260px}
-    select{padding:10px 12px; border:1px solid #ccc; border-radius:10px}
 
-    h2{margin:28px 0 12px}
-
+    /* ✅ GRILLE + COMPACT */
     .grid{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-      gap:14px;
+      grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      gap:10px;
       align-items:stretch;
     }
 
+    /* ✅ CARTE + COMPACT */
     figure{
       margin:0;
       border:1px solid #e1e1e1;
-      border-radius:12px;
-      padding:10px;
+      border-radius:10px;
+      padding:8px;
       background:#fff;
       display:flex;
       flex-direction:column;
       height:100%;
     }
 
+    /* ✅ IMAGE + COMPACT */
     .thumb{
-      height:160px;
+      height:90px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -50,7 +49,8 @@
       border-radius:10px;
     }
 
-    figcaption{font-size:13px; margin-top:8px; word-break:break-word}
+    /* ✅ TEXTE + COMPACT */
+    figcaption{font-size:12px; margin-top:6px; word-break:break-word}
     .muted{color:#666; font-size:13px}
     .missing{font-size:12px; color:#c00; margin-top:8px}
 
@@ -59,14 +59,15 @@
       display:flex;
       gap:8px;
       align-items:center;
-      margin-top:10px;
+      margin-top:8px;
     }
     .size label{font-size:12px; color:#333}
     .size select{
       width:100%;
-      padding:8px 10px;
+      padding:6px 8px;
       border:1px solid #ccc;
       border-radius:10px;
+      font-size:12px;
     }
 
     /* prix aligné en bas */
@@ -75,36 +76,73 @@
       gap:8px;
       align-items:center;
       margin-top:auto;
-      padding-top:10px;
+      padding-top:8px;
     }
     .price label{font-size:12px; color:#333}
-    .price input{width:110px; padding:8px 10px; border:1px solid #ccc; border-radius:10px}
+    .price input{
+      width:90px;
+      padding:6px 8px;
+      border:1px solid #ccc;
+      border-radius:10px;
+      font-size:12px;
+    }
     .price .eur{font-size:12px; color:#555}
 
-    .bar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
     .pill{display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border:1px solid #e1e1e1; border-radius:999px; font-size:13px; background:#fff}
     .dot{width:8px; height:8px; border-radius:999px; background:#bbb}
     .dot.ok{background:#2e7d32}
     .dot.bad{background:#c62828}
 
+    /* ✅ NOUVEAU HEADER */
+    .top{display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; margin-bottom:18px}
+    .headText{flex:1; min-width:260px}
+    .title{margin:6px 0 10px; font-size:28px}
+    .catButtons{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:8px 0 12px;
+    }
+    .catBtn{
+      padding:10px 14px;
+      border:1px solid #ccc;
+      border-radius:999px;
+      background:#fff;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .catBtn.active{
+      border-color:#111;
+      font-weight:700;
+    }
+    .tools{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
     @media (max-width: 700px){
       .logo{height:70px;}
+      .title{font-size:24px}
     }
   </style>
 </head>
 <body>
 
-<header class="bar">
+<header class="top">
   <img src="logo-site.png" alt="Raccords plomberie" class="logo">
 
-  <select id="cat"></select>
-  <input id="q" type="search" placeholder="Rechercher (ex: coude, té, 16, 20…)" />
-  <span class="muted" id="count"></span>
+  <div class="headText">
+    <h1 class="title">Raccords plomberie</h1>
 
-  <span class="pill" title="Lecture des fichiers XLSX dans le dossier prix/">
-    <span id="priceDot" class="dot"></span>
-    <span id="priceStatus">Prix : en attente…</span>
-  </span>
+    <div id="catButtons" class="catButtons"></div>
+
+    <div class="tools">
+      <input id="q" type="search" placeholder="Rechercher (ex: coude, té, 16, 20…)" />
+      <span class="muted" id="count"></span>
+
+      <span class="pill" title="Lecture des fichiers XLSX dans le dossier prix/">
+        <span id="priceDot" class="dot"></span>
+        <span id="priceStatus">Prix : en attente…</span>
+      </span>
+    </div>
+  </div>
 </header>
 
 <div id="app"></div>
@@ -112,6 +150,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
+const HIDE_A_SOUDER = true; // true = masqué, false = visible
+
 /** Images */
 const IMAGES = {
   "a-souder": [
@@ -125,29 +165,13 @@ const IMAGES = {
 
   "bicones": ["coude-femelle.png","coude-ff.png","coude-male.png","manchon-reduit.png","manchon.png","rac-femelle.png","rac-male.png","te-egal.png"],
 
-  /* ✅ LAITON (liste basée sur ton dossier GitHub) */
   "laiton": [
-    "allonge.png",
-    "bouchon.png",
-    "coude-f-f.png",
-    "coude-m-f.png",
-    "coude-union.png",
-    "laiton-bonnet.png",
-    "laiton-culasse.png",
-    "laiton-manchon.png",
-    "nipple-reduite.png",
-    "nipple.png",
-    "rac-union.png",
-    "reduction-f-f.png",
-    "reduction-f-m.png",
-    "te-egal.png",
-    "tes-1.png",
-    "tes-2.png",
-    "tetine-femelle.png",
-    "tetine-male.png"
+    "allonge.png","bouchon.png","coude-f-f.png","coude-m-f.png","coude-union.png",
+    "laiton-bonnet.png","laiton-culasse.png","laiton-manchon.png","nipple-reduite.png","nipple.png",
+    "rac-union.png","reduction-f-f.png","reduction-f-m.png","te-egal.png","tes-1.png","tes-2.png",
+    "tetine-femelle.png","tetine-male.png"
   ],
 
-  /* ✅ Collecteurs */
   "collecteurs": [
     "collecteur-2-bleu.png","collecteur-2-rouge.png",
     "collecteur-3-bleu.png","collecteur-3-rouge.png",
@@ -156,12 +180,7 @@ const IMAGES = {
     "collecteur-6-bleu.png","collecteur-6-rouge.png"
   ],
 
-  /* ✅ GEKA (AJOUTÉ) */
-  "geka": [
-    "rac-geka-F.png",
-    "rac-geka-M.png",
-    "rac-geka-T.png"
-  ],
+  "geka": ["rac-geka-F.png","rac-geka-M.png","rac-geka-T.png"],
 
   "pex-a-sertir": [
     "bouchon.png","coude-egal.png","coude-femelle-el.png","coude-femelle.png","coude-male.png",
@@ -195,8 +214,6 @@ const CAT_SIZES = {
   "acc-tube-polyethylene/rexuo": ["Ø25", "Ø32"],
 
   "bicones": ["3/8", "1/2", "3/4", "4/4", "5/4"],
-
-  /* ✅ IMPORTANT : ici ce sont des TAILLES, pas des images */
   "laiton": ["3/8", "1/2", "3/4", "4/4", "5/4"],
 
   "collecteurs": [
@@ -204,7 +221,6 @@ const CAT_SIZES = {
     "4/4-2", "4/4-5"
   ],
 
-  /* ✅ GEKA (fallback tailles) */
   "geka": ["1/2", "3/4"],
 
   "pex-a-sertir": ["Ø16", "Ø20", "Ø26"],
@@ -232,17 +248,50 @@ let SIZES_BY_PATH = Object.create(null);
 
 // UI
 const app = document.getElementById("app");
-const catSel = document.getElementById("cat");
 const q = document.getElementById("q");
 const count = document.getElementById("count");
 const priceStatus = document.getElementById("priceStatus");
 const priceDot = document.getElementById("priceDot");
+const catButtons = document.getElementById("catButtons");
 
-const categories = Object.keys(IMAGES);
+/** Ordre + libellés demandés */
+const CATEGORY_UI = [
+  { id: "laiton", label: "Raccords Laiton" },
+  { id: "bicones", label: "Raccords Bicône" },
+  { id: "pex", label: "Raccords  Alpex" },
+  { id: "pex-a-sertir", label: "Raccords Alpex à sertir" },
+  { id: "push", label: "Raccords Push" },
+  { id: "collecteurs", label: "Collecteurs" },
+  { id: "acc-tube-polyethylene/huot", label: "Raccords Huot" },
+  { id: "acc-tube-polyethylene/rexuo", label: "Raccords Rexuo" },
+  { id: "acc-tube-polyethylene/plasson", label: "Raccords Plasson" },
+  { id: "geka", label: "Raccords Geka" }
+];
 
-catSel.innerHTML =
-  `<option value="__all__">Toutes les catégories</option>` +
-  categories.map(c => `<option value="${c}">${c}</option>`).join("");
+/** catégories dispo (en respectant HIDE_A_SOUDER) */
+const allowedCats = new Set(Object.keys(IMAGES).filter(cat => {
+  if (HIDE_A_SOUDER && cat === "a-souder") return false;
+  return true;
+}));
+
+const categories = CATEGORY_UI.filter(c => allowedCats.has(c.id));
+let activeCat = categories[0]?.id || "__none__";
+
+function buildCatButtons(){
+  catButtons.innerHTML = categories.map(c => `
+    <button class="catBtn ${c.id===activeCat?'active':''}" data-cat="${c.id}" type="button">
+      ${c.label}
+    </button>
+  `).join("");
+
+  catButtons.querySelectorAll("button[data-cat]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeCat = btn.dataset.cat;
+      buildCatButtons();
+      render();
+    });
+  });
+}
 
 function setPriceIndicator(ok, text){
   priceStatus.textContent = text;
@@ -380,82 +429,86 @@ function setStoredSize(key, val){
 }
 
 function render(){
-  const selected = catSel.value;
   const query = q.value.trim().toLowerCase();
 
-  let total = 0;
-  let html = "";
-
-  for(const cat of categories){
-    if(selected !== "__all__" && cat !== selected) continue;
-
-    const files = (IMAGES[cat] || []).filter(f => f.toLowerCase().includes(query));
-    if(!files.length) continue;
-
-    total += files.length;
-    html += `<h2>${cat}</h2><div class="grid">`;
-
-    for(const f of files){
-      const src = `${cat}/${encodeURIComponent(f)}`;
-      const label = f.replace(/\.(png|jpg|jpeg|webp)$/i, "");
-      const pathKey = `${cat}/${f}`;
-
-      // ✅ Tailles depuis Excel si dispo, sinon fallback propre
-      let options = (SIZES_BY_PATH[pathKey] && SIZES_BY_PATH[pathKey].length)
-        ? SIZES_BY_PATH[pathKey]
-        : getSizeOptions(cat, f);
-
-      const defaultSize = options[0] || "";
-      let currentSize = getStoredSize(pathKey, defaultSize);
-
-      // ✅ Si localStorage contient une taille invalide, on corrige
-      if(currentSize && !options.includes(currentSize)){
-        currentSize = defaultSize;
-        setStoredSize(pathKey, currentSize);
-      }
-
-      const price = PRICE_MAP[`${pathKey}|${normalizeSize(currentSize)}`];
-
-      const selectId = "s_" + btoa(pathKey).replace(/=+/g,'');
-      const priceId  = "p_" + btoa(pathKey).replace(/=+/g,'');
-
-      html += `
-        <figure>
-          <a class="thumb" href="${src}" target="_blank" rel="noopener">
-            <img src="${src}" alt="${label}"
-              onerror="this.style.display='none'; this.closest('figure').insertAdjacentHTML('beforeend','<div class=\\'missing\\'>❌ Introuvable : ${src}</div>')">
-          </a>
-
-          <figcaption>${label}</figcaption>
-
-          <div class="size">
-            <label for="${selectId}">Taille</label>
-            <select id="${selectId}" data-path="${pathKey}">
-              ${options.map(o => `<option value="${o}" ${o===currentSize?'selected':''}>${o}</option>`).join("")}
-            </select>
-          </div>
-
-          <div class="price">
-            <label for="${priceId}">Prix TVAC</label>
-            <input
-              id="${priceId}"
-              type="text"
-              inputmode="decimal"
-              value="${price !== undefined ? formatPrice(price) : ""}"
-              placeholder="—"
-              readonly
-              title="Prix chargé depuis les fichiers du dossier prix/ (modifiable via Excel)"
-            />
-            <span class="eur">€</span>
-          </div>
-        </figure>
-      `;
-    }
-
-    html += `</div>`;
+  const cat = activeCat;
+  if(!cat || !IMAGES[cat]){
+    app.innerHTML = `<p class="muted">Aucune catégorie à afficher.</p>`;
+    count.textContent = "";
+    return;
   }
 
-  app.innerHTML = html || `<p class="muted">Aucune image à afficher.</p>`;
+  const files = (IMAGES[cat] || []).filter(f => f.toLowerCase().includes(query));
+  const total = files.length;
+
+  if(!files.length){
+    app.innerHTML = `<p class="muted">Aucune image à afficher.</p>`;
+    count.textContent = "";
+    return;
+  }
+
+  let html = `<div class="grid">`;
+
+  for(const f of files){
+    const src = `${cat}/${encodeURIComponent(f)}`;
+    const label = f.replace(/\.(png|jpg|jpeg|webp)$/i, "");
+    const pathKey = `${cat}/${f}`;
+
+    // ✅ Tailles depuis Excel si dispo, sinon fallback propre
+    let options = (SIZES_BY_PATH[pathKey] && SIZES_BY_PATH[pathKey].length)
+      ? SIZES_BY_PATH[pathKey]
+      : getSizeOptions(cat, f);
+
+    const defaultSize = options[0] || "";
+    let currentSize = getStoredSize(pathKey, defaultSize);
+
+    // ✅ Si localStorage contient une taille invalide, on corrige
+    if(currentSize && !options.includes(currentSize)){
+      currentSize = defaultSize;
+      setStoredSize(pathKey, currentSize);
+    }
+
+    const price = PRICE_MAP[`${pathKey}|${normalizeSize(currentSize)}`];
+
+    const selectId = "s_" + btoa(pathKey).replace(/=+/g,'');
+    const priceId  = "p_" + btoa(pathKey).replace(/=+/g,'');
+
+    html += `
+      <figure>
+        <a class="thumb" href="${src}" target="_blank" rel="noopener">
+          <img src="${src}" alt="${label}"
+            onerror="this.style.display='none'; this.closest('figure').insertAdjacentHTML('beforeend','<div class=\\'missing\\'>❌ Introuvable : ${src}</div>')">
+        </a>
+
+        <figcaption>${label}</figcaption>
+
+        <div class="size">
+          <label for="${selectId}">Taille</label>
+          <select id="${selectId}" data-path="${pathKey}">
+            ${options.map(o => `<option value="${o}" ${o===currentSize?'selected':''}>${o}</option>`).join("")}
+          </select>
+        </div>
+
+        <div class="price">
+          <label for="${priceId}">Prix TVAC</label>
+          <input
+            id="${priceId}"
+            type="text"
+            inputmode="decimal"
+            value="${price !== undefined ? formatPrice(price) : ""}"
+            placeholder="—"
+            readonly
+            title="Prix chargé depuis les fichiers du dossier prix/ (modifiable via Excel)"
+          />
+          <span class="eur">€</span>
+        </div>
+      </figure>
+    `;
+  }
+
+  html += `</div>`;
+
+  app.innerHTML = html;
   count.textContent = total ? `${total} image(s)` : "";
 
   // Bind change events for size selects
@@ -473,11 +526,11 @@ function render(){
   });
 }
 
-catSel.addEventListener("change", render);
 q.addEventListener("input", render);
 
 (async function init(){
   await loadPricesFromFolder();
+  buildCatButtons();
   render();
 })();
 </script>
