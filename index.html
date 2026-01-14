@@ -132,24 +132,54 @@
       justify-content: center;
     }
 
-    .price-big {
+    /* ===== PRIX (plus petit, gris, Tvac € petit, décimales en exposant) ===== */
+    .price {
+      margin-top: auto;
+      padding: 6px 0 2px;
       display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      font-weight: 900;
-      color: #222;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
 
-    .price-big .amount {
-      font-size: 32px;
+    .price-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      /* gris foncé */
       line-height: 1;
     }
 
-    .price-big .currency {
-      font-size: 14px;
+    .price-amount {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      font-weight: 800;
+      color: #333;
+      /* gris foncé (pas noir) */
       line-height: 1;
-      margin-bottom: 4px;
     }
+
+    .price-amount .int {
+      font-size: 26px;
+    }
+
+    /* moins gros */
+    .price-amount .dec {
+      font-size: 13px;
+      position: relative;
+      top: 2px;
+    }
+
+    /* exposant léger */
+    .price-amount .eur {
+      font-size: 13px;
+      font-weight: 700;
+      color: #444;
+      position: relative;
+      top: 10px;
+    }
+
 
     header.top {
       display: flex;
@@ -811,16 +841,19 @@
             ${options.map(o => `<option value="${o}" ${o === currentSize ? 'selected' : ''}>${o}</option>`).join("")}
           </select>
         </div>
-
-        <div class="price">
-          ${price !== undefined
-            ? `<div class="price-big">
-                 <span class="amount">${formatPrice(price)}</span>
-                 <span class="currency">€</span>
-               </div>`
-            : `<div class="price-big muted">—</div>`
+<div class="price">
+  <div class="price-label">Tvac €</div>
+  ${price !== undefined
+            ? `<div class="price-amount">
+         <span class="int">${formatPrice(price).split(".")[0]}</span>
+         <span class="dec">${formatPrice(price).split(".")[1] || "00"}</span>
+         <span class="eur">€</span>
+       </div>`
+            : `<div class="price-amount muted">—</div>`
           }
-        </div>
+</div>
+
+        
       </figure>
     `;
       }
@@ -842,14 +875,27 @@
           const priceBox = figure ? figure.querySelector(".price") : null;
 
           if (priceBox) {
-            priceBox.innerHTML =
-              price !== undefined
-                ? `<div class="price-big">
-                     <span class="amount">${formatPrice(price)}</span>
-                     <span class="currency">€</span>
-                   </div>`
-                : `<div class="price-big muted">—</div>`;
+            if (price !== undefined) {
+              const s = formatPrice(price);
+              const intPart = s.split(".")[0];
+              const decPart = s.split(".")[1] || "00";
+
+              priceBox.innerHTML = `
+      <div class="price-label">Tvac €</div>
+      <div class="price-amount">
+        <span class="int">${intPart}</span>
+        <span class="dec">${decPart}</span>
+        <span class="eur">€</span>
+      </div>
+    `;
+            } else {
+              priceBox.innerHTML = `
+      <div class="price-label">Tvac €</div>
+      <div class="price-amount muted">—</div>
+    `;
+            }
           }
+
 
           // stock
           const stockId = sel.dataset.stockId;
