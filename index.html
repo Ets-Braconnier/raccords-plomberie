@@ -842,7 +842,7 @@
           </select>
         </div>
 <div class="price">
-  <div class="price-label">Tvac €</div>
+  <div class="price-label">Tvac</div>
   ${price !== undefined
             ? `<div class="price-amount">
          <span class="int">${formatPrice(price).split(".")[0]}</span>
@@ -881,7 +881,7 @@
               const decPart = s.split(".")[1] || "00";
 
               priceBox.innerHTML = `
-      <div class="price-label">Tvac €</div>
+      <div class="price-label">Tvac</div>
       <div class="price-amount">
         <span class="int">${intPart}</span>
         <span class="dec">${decPart}</span>
@@ -890,7 +890,7 @@
     `;
             } else {
               priceBox.innerHTML = `
-      <div class="price-label">Tvac €</div>
+      <div class="price-label">Tvac</div>
       <div class="price-amount muted">—</div>
     `;
             }
