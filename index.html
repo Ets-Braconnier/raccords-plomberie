@@ -814,12 +814,14 @@
       const cat = activeCat;
       if (!cat || !IMAGES[cat]) {
         app.innerHTML = `<p class="muted">Aucune catégorie à afficher.</p>`;
+        sendHeight();
         return;
       }
 
       const files = (IMAGES[cat] || []).filter(f => f.toLowerCase().includes(query));
       if (!files.length) {
         app.innerHTML = `<p class="muted">Aucune image à afficher.</p>`;
+        sendHeight();
         return;
       }
 
@@ -929,8 +931,11 @@
           const stockId = sel.dataset.stockId;
           const st = document.getElementById(stockId);
           if (st) st.textContent = stockLabelFor(k);
+          sendHeight();
+
         });
       });
+      sendHeight();
     }
 
     (async function init() {
@@ -939,11 +944,30 @@
       buildCatSelect();
       syncCategoryUI();
       render();
+      sendHeight();
 
       window.addEventListener("resize", () => {
         fitCategoryButtons();
       });
+      sendHeight();
     })();
+    function sendHeight() {
+      const h = document.documentElement.scrollHeight;
+
+      if (window.parent !== window) {
+        window.parent.postMessage(
+          { type: "resize", height: h },
+          "*"
+        );
+      }
+    }
+
+    // au chargement
+    window.addEventListener("load", sendHeight);
+
+    // au redimensionnement
+    window.addEventListener("resize", sendHeight);
+
   </script>
 </body>
 
