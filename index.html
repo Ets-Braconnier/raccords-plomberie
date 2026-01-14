@@ -60,6 +60,14 @@
     .muted{color:#666; font-size:13px}
     .missing{font-size:12px; color:#c00; margin-top:8px}
 
+    /* ✅ Stock (badge texte discret) */
+    .stock{
+      margin-top:6px;
+      font-size:12px;
+      font-weight:700;
+      text-align:center;
+    }
+
     /* bloc taille au-dessus du prix */
     .size{
       display:flex;
@@ -233,13 +241,12 @@ const IMAGES = {
 
   /* ✅ NOUVEAU : Tube Alpex */
   "tube-alpex": [
-  "Tube-Alpex.png",
-  "Tube-Alpex-isolé-rouge.png",
-  "Tube-Alpex-isolé-bleu.png",
-  "Tube-Alpex-gaine-rouge.png",
-  "Tube-Alpex-gaine-bleue.png"
-]
-
+    "Tube-Alpex.png",
+    "Tube-Alpex-isolé-rouge.png",
+    "Tube-Alpex-isolé-bleu.png",
+    "Tube-Alpex-gaine-rouge.png",
+    "Tube-Alpex-gaine-bleue.png"
+  ]
 };
 
 /** ✅ NOMS D’AFFICHAGE PERSONNALISÉS (OPTIONNELS) */
@@ -301,6 +308,11 @@ const PRICE_MANIFEST_URL = "prix/manifest.json";
 
 /** Map prix: clé = "path|taille" => prix_tvac */
 let PRICE_MAP = Object.create(null);
+
+/** ✅ Map stock: clé = "path|taille" => disponible (nombre)
+    Règle: vide = 0, <= 0 rupture, > 0 en stock
+*/
+let STOCK_MAP = Object.create(null);
 
 /** Index tailles disponibles par article (dérivé des fichiers prix) */
 let SIZES_BY_PATH = Object.create(null);
@@ -412,6 +424,16 @@ function normalizeSize(s){
   return String(s || "").trim();
 }
 
+function getKey(path, taille){
+  return `${path}|${normalizeSize(taille)}`;
+}
+
+function stockLabelFor(key){
+  // règle: si pas de valeur => 0 => rupture
+  const v = Number(STOCK_MAP[key]);
+  return (v > 0) ? "✅ En stock" : "⚠️ Rupture";
+}
+
 async function fetchJson(url){
   const res = await fetch(url, { cache: "no-store" });
   if(!res.ok) throw new Error(`HTTP ${res.status} sur ${url}`);
@@ -430,11 +452,28 @@ async function fetchXlsxAsPriceMap(xlsxUrl){
   const rows = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
 
   const map = Object.create(null);
+  const stock = Object.create(null);
 
   for(const r of rows){
     let path = String(r.path || r.Path || r.PATH || "").trim();
     const taille = normalizeSize(r.taille ?? r.Taille ?? r.TAILLE ?? "");
     let price = r.prix_tvac ?? r.Prix_TVAC ?? r.PRIX_TVAC ?? r.prix ?? r.Prix ?? "";
+
+    // ✅ stock (vide = 0)
+    let stockRaw =
+      r.disponible ??
+      r.Disponible ??
+      r.DISPO ??
+      r.dispo ??
+      r.stock ??
+      r.Stock ??
+      "";
+
+    let stockVal = String(stockRaw).trim() === ""
+      ? 0
+      : Number(String(stockRaw).replace(",", "."));
+
+    if(!Number.isFinite(stockVal)) stockVal = 0;
 
     if(!path) continue;
 
@@ -445,11 +484,13 @@ async function fetchXlsxAsPriceMap(xlsxUrl){
     const num = Number(price);
 
     if(Number.isFinite(num)){
-      map[`${path}|${taille}`] = num;
+      const k = getKey(path, taille);
+      map[k] = num;
+      stock[k] = stockVal; // stock piloté par excel (vide => 0)
     }
   }
 
-  return { map };
+  return { map, stock };
 }
 
 function buildSizesByPath(priceMap){
@@ -470,15 +511,14 @@ function buildSizesByPath(priceMap){
 
   const collator = new Intl.Collator("fr", { numeric: true, sensitivity: "base" });
 
-for (const p of Object.keys(idx)) {
-  const unique = Array.from(new Set(idx[p]));
+  for (const p of Object.keys(idx)) {
+    const unique = Array.from(new Set(idx[p]));
+    const allNumeric = unique.every(v => /^\d+(?:[.,]\d+)?$/.test(String(v).trim()));
 
-  const allNumeric = unique.every(v => /^\d+(?:[.,]\d+)?$/.test(String(v).trim()));
-
-  idx[p] = allNumeric
-    ? unique.sort((a, b) => Number(String(a).replace(",", ".")) - Number(String(b).replace(",", ".")))
-    : unique.sort((a, b) => collator.compare(String(a), String(b)));
-}
+    idx[p] = allNumeric
+      ? unique.sort((a, b) => Number(String(a).replace(",", ".")) - Number(String(b).replace(",", ".")))
+      : unique.sort((a, b) => collator.compare(String(a), String(b)));
+  }
 
   return idx;
 }
@@ -489,22 +529,26 @@ async function loadPricesFromFolder(){
     if(!Array.isArray(files) || files.length === 0) throw new Error("manifest vide ou invalide");
 
     const merged = Object.create(null);
+    const mergedStock = Object.create(null);
 
     for(const fname of files){
       const url = `prix/${fname}`;
       try{
-        const { map } = await fetchXlsxAsPriceMap(url);
+        const { map, stock } = await fetchXlsxAsPriceMap(url);
         for(const k of Object.keys(map)) merged[k] = map[k];
+        for(const k of Object.keys(stock)) mergedStock[k] = stock[k];
       }catch(e){
         console.warn("Fichier prix ignoré:", url, e);
       }
     }
 
     PRICE_MAP = merged;
+    STOCK_MAP = mergedStock;
     SIZES_BY_PATH = buildSizesByPath(PRICE_MAP);
 
   }catch(e){
     PRICE_MAP = Object.create(null);
+    STOCK_MAP = Object.create(null);
     SIZES_BY_PATH = Object.create(null);
     console.error(e);
   }
@@ -562,10 +606,13 @@ function render(){
       setStoredSize(pathKey, currentSize);
     }
 
-    const price = PRICE_MAP[`${pathKey}|${normalizeSize(currentSize)}`];
+    const k = getKey(pathKey, currentSize);
+    const price = PRICE_MAP[k];
+    const stockText = stockLabelFor(k);
 
     const selectId = "s_" + btoa(pathKey).replace(/=+/g,'');
     const priceId  = "p_" + btoa(pathKey).replace(/=+/g,'');
+    const stockId  = "st_" + btoa(pathKey).replace(/=+/g,'');
 
     html += `
       <figure>
@@ -576,9 +623,11 @@ function render(){
 
         <figcaption>${label}</figcaption>
 
+        <div class="stock" id="${stockId}">${stockText}</div>
+
         <div class="size">
           <label for="${selectId}">Taille</label>
-          <select id="${selectId}" data-path="${pathKey}">
+          <select id="${selectId}" data-path="${pathKey}" data-stock-id="${stockId}">
             ${options.map(o => `<option value="${o}" ${o===currentSize?'selected':''}>${o}</option>`).join("")}
           </select>
         </div>
@@ -608,10 +657,18 @@ function render(){
       const taille = normalizeSize(sel.value);
       setStoredSize(pathKey, taille);
 
-      const price = PRICE_MAP[`${pathKey}|${taille}`];
+      const k = getKey(pathKey, taille);
+
+      // prix
+      const price = PRICE_MAP[k];
       const priceId  = "p_" + btoa(pathKey).replace(/=+/g,'');
       const inp = document.getElementById(priceId);
       if(inp) inp.value = price !== undefined ? formatPrice(price) : "";
+
+      // stock
+      const stockId = sel.dataset.stockId;
+      const st = document.getElementById(stockId);
+      if(st) st.textContent = stockLabelFor(k);
     });
   });
 }
