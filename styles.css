@@ -1,0 +1,238 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  line-height: 1.4
+}
+
+.logo {
+  height: 90px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+figure {
+  margin: 0;
+  border: 1px solid #e1e1e1;
+  border-radius: 10px;
+  padding: 8px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.thumb {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+figcaption {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  background: #f2f2f2;
+  width: 100%;
+
+  padding: 6px 6px;
+  margin: 0 0 6px 0;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  border-radius: 8px;
+
+  /* === ALIGNEMENT DES CARTES === */
+  height: 42px; /* hauteur fixe pour tous les titres */
+  display: flex;
+  align-items: center; /* centre verticalement */
+  justify-content: center; /* centre horizontalement */
+  line-height: 1.2;
+}
+
+.muted {
+  color: #666;
+  font-size: 13px
+}
+
+.missing {
+  font-size: 12px;
+  color: #c00;
+  margin-top: 8px
+}
+
+.stock {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.size {
+  display: flex;
+  align-items: center;
+  margin-top: 4px; /* espace réduit */
+}
+
+.size label {
+  font-size: 12px;
+  color: #333
+}
+
+.size select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+/* ===== PRIX EN GROS (SANS CASE) ===== */
+.price {
+  margin-top: auto;
+  padding: 6px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== PRIX (plus petit, gris, Tvac € petit, décimales en exposant) ===== */
+.price {
+  margin-top: auto;
+  padding: 6px 0 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.price-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555; /* gris foncé */
+  line-height: 1;
+}
+
+.price-amount {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-weight: 800;
+  color: #333; /* gris foncé (pas noir) */
+  line-height: 1;
+}
+
+.price-amount .int {
+  font-size: 26px;
+}
+
+/* moins gros */
+.price-amount .dec {
+  font-size: 13px;
+  position: relative;
+  top: 2px;
+}
+
+/* exposant léger */
+.price-amount .eur {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+  position: relative;
+  top: 10px;
+}
+
+header.top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+#app {
+  margin-top: 12px;
+}
+
+:root {
+  --cat-font: 12px;
+  --cat-py: 6px;
+  --cat-px: 10px;
+  --cat-gap: 6px;
+}
+
+.catButtons {
+  display: flex;
+  gap: var(--cat-gap);
+  flex-wrap: nowrap;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.catBtn {
+  padding: var(--cat-py) var(--cat-px);
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  font-size: var(--cat-font);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.catBtn.active {
+  border-color: #111;
+  font-weight: 700;
+}
+
+.catSelect {
+  display: none;
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+@media (max-width: 700px) {
+  .logo {
+    height: 70px;
+  }
+
+  .catButtons {
+    display: none;
+  }
+
+  .catSelect {
+    display: block;
+  }
+}
