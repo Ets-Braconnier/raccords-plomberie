@@ -571,14 +571,14 @@
       const cat = activeCat;
       if (!cat || !IMAGES[cat]) {
         app.innerHTML = `<p class="muted">Aucune catégorie à afficher.</p>`;
-        sendHeight();
+        sendHeightSoon();
         return;
       }
 
       const files = (IMAGES[cat] || []).filter(f => f.toLowerCase().includes(query));
       if (!files.length) {
         app.innerHTML = `<p class="muted">Aucune image à afficher.</p>`;
-        sendHeight();
+        sendHeightSoon();
         return;
       }
 
@@ -688,11 +688,11 @@
           const stockId = sel.dataset.stockId;
           const st = document.getElementById(stockId);
           if (st) st.textContent = stockLabelFor(k);
-          sendHeight();
+          sendHeightSoon();
 
         });
       });
-      sendHeight();
+      sendHeightSoon();
     }
 
     (async function init() {
@@ -701,15 +701,21 @@
       buildCatSelect();
       syncCategoryUI();
       render();
-      sendHeight();
 
       window.addEventListener("resize", () => {
         fitCategoryButtons();
+        sendHeightSoon();
       });
-      sendHeight();
+
     })();
+  </script>
+
+  <script>
     function sendHeight() {
-      const h = document.documentElement.scrollHeight;
+      const h = Math.max(
+        document.body ? document.body.scrollHeight : 0,
+        document.documentElement ? document.documentElement.scrollHeight : 0
+      );
 
       if (window.parent !== window) {
         window.parent.postMessage(
@@ -719,12 +725,16 @@
       }
     }
 
-    // au chargement
-    window.addEventListener("load", sendHeight);
+    function sendHeightSoon() {
+      requestAnimationFrame(() => {
+        sendHeight();
+        setTimeout(sendHeight, 150);
+        setTimeout(sendHeight, 600);
+      });
+    }
 
-    // au redimensionnement
-    window.addEventListener("resize", sendHeight);
-
+    window.addEventListener("load", sendHeightSoon);
+    window.addEventListener("resize", sendHeightSoon);
   </script>
 </body>
 
