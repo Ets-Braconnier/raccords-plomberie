@@ -298,6 +298,16 @@
     const catButtons = document.getElementById("catButtons");
     const catSelect = document.getElementById("catSelect");
 
+    const CAT_ICONS = {
+      "laiton": "vignettes-boutons/laiton.png",
+      "bicones": "vignettes-boutons/bicone.png",
+      "push": "vignettes-boutons/push.png",          
+      "geka": "vignettes-boutons/geka.png",
+      "pex": "vignettes-boutons/alpex.png",
+      "pex-a-sertir": "vignettes-boutons/alpex-a-sertir.png",
+    };
+    ;
+
     /** Ordre + libellés demandés */
     const CATEGORY_UI = [
       { id: "laiton", label: "Raccords Laiton" },
@@ -323,11 +333,17 @@
     let activeCat = categories[0]?.id || "__none__";
 
     function buildCatButtons() {
-      catButtons.innerHTML = categories.map(c => `
-    <button class="catBtn ${c.id === activeCat ? 'active' : ''}" data-cat="${c.id}" type="button">
-      ${c.label}
-    </button>
-  `).join("");
+      catButtons.innerHTML = categories.map(c => {
+        const icon = CAT_ICONS[c.id];
+
+        return `
+      <button class="catBtn ${c.id === activeCat ? 'active' : ''}"
+              data-cat="${c.id}" type="button">
+        ${icon ? `<img src="${icon}" alt="" class="catIcon">` : ``}
+        <span>${c.label}</span>
+      </button>
+    `;
+      }).join("");
 
       catButtons.querySelectorAll("button[data-cat]").forEach(btn => {
         btn.addEventListener("click", () => {

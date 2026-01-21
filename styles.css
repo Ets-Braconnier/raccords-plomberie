@@ -7,14 +7,15 @@
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
-  line-height: 1.4
+  line-height: 1.4;
 }
 
 .logo {
   height: 90px;
   width: auto;
   flex-shrink: 0;
-  margin-bottom: 25px; /* ← ESPACE ENTRE LOGO ET BOUTONS */
+  margin-bottom: 25px;
+  /* ← ESPACE ENTRE LOGO ET BOUTONS */
 }
 
 .grid {
@@ -60,31 +61,32 @@ figcaption {
   text-align: center;
   background: #f2f2f2;
   width: 100%;
-
   padding: 6px 6px;
   margin: 0 0 6px 0;
-
   word-break: break-word;
   overflow-wrap: anywhere;
   border-radius: 8px;
 
   /* === ALIGNEMENT DES CARTES === */
-  height: 42px; /* hauteur fixe pour tous les titres */
+  height: 42px;
+  /* hauteur fixe pour tous les titres */
   display: flex;
-  align-items: center; /* centre verticalement */
-  justify-content: center; /* centre horizontalement */
+  align-items: center;
+  /* centre verticalement */
+  justify-content: center;
+  /* centre horizontalement */
   line-height: 1.2;
 }
 
 .muted {
   color: #666;
-  font-size: 13px
+  font-size: 13px;
 }
 
 .missing {
   font-size: 12px;
   color: #c00;
-  margin-top: 8px
+  margin-top: 8px;
 }
 
 .stock {
@@ -97,12 +99,13 @@ figcaption {
 .size {
   display: flex;
   align-items: center;
-  margin-top: 4px; /* espace réduit */
+  margin-top: 4px;
+  /* espace réduit */
 }
 
 .size label {
   font-size: 12px;
-  color: #333
+  color: #333;
 }
 
 .size select {
@@ -111,14 +114,6 @@ figcaption {
   border: 1px solid #ccc;
   border-radius: 10px;
   font-size: 12px;
-}
-
-/* ===== PRIX EN GROS (SANS CASE) ===== */
-.price {
-  margin-top: auto;
-  padding: 6px 0;
-  display: flex;
-  justify-content: center;
 }
 
 /* ===== PRIX (plus petit, gris, Tvac € petit, décimales en exposant) ===== */
@@ -134,7 +129,8 @@ figcaption {
 .price-label {
   font-size: 11px;
   font-weight: 600;
-  color: #555; /* gris foncé */
+  color: #555;
+  /* gris foncé */
   line-height: 1;
 }
 
@@ -143,7 +139,8 @@ figcaption {
   align-items: flex-start;
   gap: 4px;
   font-weight: 800;
-  color: #333; /* gris foncé (pas noir) */
+  color: #333;
+  /* gris foncé (pas noir) */
   line-height: 1;
 }
 
@@ -151,14 +148,12 @@ figcaption {
   font-size: 26px;
 }
 
-/* moins gros */
 .price-amount .dec {
   font-size: 13px;
   position: relative;
   top: 2px;
 }
 
-/* exposant léger */
 .price-amount .eur {
   font-size: 13px;
   font-weight: 700;
@@ -197,6 +192,7 @@ header.top {
   width: 100%;
 }
 
+/* ===== BOUTONS CATEGORIES : LOGO AU-DESSUS DU TEXTE ===== */
 .catBtn {
   padding: var(--cat-py) var(--cat-px);
   border: 1px solid #ccc;
@@ -204,8 +200,33 @@ header.top {
   background: #fff;
   cursor: pointer;
   font-size: var(--cat-font);
-  white-space: nowrap;
   flex: 0 0 auto;
+
+  /* logo au-dessus du texte */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  /* pour rendre le logo lisible sans faire trop gros */
+  min-height: 92px;
+}
+
+.catBtn .catIcon {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.catBtn span {
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.15;
+
+  /* permet de ne pas casser la mise en page tout en autorisant les retours */
+  white-space: normal;
 }
 
 .catBtn.active {
