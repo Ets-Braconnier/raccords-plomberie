@@ -299,28 +299,39 @@
     const catSelect = document.getElementById("catSelect");
 
     const CAT_ICONS = {
+      "a-souder": "vignettes-boutons/a-souder.png",
+
       "laiton": "vignettes-boutons/laiton.png",
       "bicones": "vignettes-boutons/bicone.png",
-      "push": "vignettes-boutons/push.png",          
+      "push": "vignettes-boutons/push.png",
+      "collecteurs": "vignettes-boutons/collecteur.png",
+
+      "acc-tube-polyethylene/huot": "vignettes-boutons/huot.png",
+      "acc-tube-polyethylene/rexuo": "vignettes-boutons/rexuo.png",
+      "acc-tube-polyethylene/plasson": "vignettes-boutons/plasson.png",
+
       "geka": "vignettes-boutons/geka.png",
-      "pex": "vignettes-boutons/alpex.png",
-      "pex-a-sertir": "vignettes-boutons/alpex-a-sertir.png",
+      "pex": "vignettes-boutons/pex.png",
+      "pex-a-sertir": "vignettes-boutons/pex-a-sertir.png",
+
+      "tube-alpex": "vignettes-boutons/Tube-Alpex.png"
     };
+
     ;
 
     /** Ordre + libellés demandés */
     const CATEGORY_UI = [
-      { id: "laiton", label: "Raccords Laiton" },
-      { id: "bicones", label: "Raccords Bicône" },
-      { id: "push", label: "Raccords Push" },
+      { id: "laiton", label: "Laiton" },
+      { id: "bicones", label: "Bicône" },
+      { id: "push", label: "Push" },
       { id: "collecteurs", label: "Collecteurs" },
-      { id: "acc-tube-polyethylene/huot", label: "Raccords Huot" },
-      { id: "acc-tube-polyethylene/rexuo", label: "Raccords Rexuo" },
-      { id: "acc-tube-polyethylene/plasson", label: "Raccords Plasson" },
-      { id: "geka", label: "Raccords Geka" },
+      { id: "acc-tube-polyethylene/huot", label: "Huot" },
+      { id: "acc-tube-polyethylene/rexuo", label: "Rexuo" },
+      { id: "acc-tube-polyethylene/plasson", label: "Plasson" },
+      { id: "geka", label: "Geka" },
       { id: "pex", label: "Raccords Alpex" },
-      { id: "pex-a-sertir", label: "Raccords Alpex à sertir" },
-      { id: "tube-alpex", label: "Tubes Alpex" },
+      { id: "pex-a-sertir", label: "Alpex à sertir" },
+      { id: "tube-alpex", label: "Tube Alpex" },
     ];
 
     /** catégories dispo (en respectant HIDE_A_SOUDER) */
@@ -339,7 +350,11 @@
         return `
       <button class="catBtn ${c.id === activeCat ? 'active' : ''}"
               data-cat="${c.id}" type="button">
-        ${icon ? `<img src="${icon}" alt="" class="catIcon">` : ``}
+        ${icon ? `
+          <div class="catIcon">
+            <img src="${icon}" alt="">
+          </div>
+        ` : ``}
         <span>${c.label}</span>
       </button>
     `;
@@ -353,6 +368,7 @@
         });
       });
     }
+
 
     function buildCatSelect() {
       catSelect.innerHTML = categories

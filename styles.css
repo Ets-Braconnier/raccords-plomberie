@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+/* ======================
+   BASE
+====================== */
+
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
@@ -11,12 +15,15 @@ body {
 }
 
 .logo {
-  height: 90px;
+  height: 120px;
   width: auto;
   flex-shrink: 0;
   margin-bottom: 25px;
-  /* ← ESPACE ENTRE LOGO ET BOUTONS */
 }
+
+/* ======================
+   GRILLE PRODUITS
+====================== */
 
 .grid {
   display: grid;
@@ -61,22 +68,20 @@ figcaption {
   text-align: center;
   background: #f2f2f2;
   width: 100%;
-  padding: 6px 6px;
+  padding: 6px;
   margin: 0 0 6px 0;
-  word-break: break-word;
-  overflow-wrap: anywhere;
   border-radius: 8px;
 
-  /* === ALIGNEMENT DES CARTES === */
   height: 42px;
-  /* hauteur fixe pour tous les titres */
   display: flex;
   align-items: center;
-  /* centre verticalement */
   justify-content: center;
-  /* centre horizontalement */
   line-height: 1.2;
 }
+
+/* ======================
+   TEXTE / ÉTATS
+====================== */
 
 .muted {
   color: #666;
@@ -96,16 +101,14 @@ figcaption {
   text-align: center;
 }
 
+/* ======================
+   TAILLES
+====================== */
+
 .size {
   display: flex;
   align-items: center;
   margin-top: 4px;
-  /* espace réduit */
-}
-
-.size label {
-  font-size: 12px;
-  color: #333;
 }
 
 .size select {
@@ -116,7 +119,10 @@ figcaption {
   font-size: 12px;
 }
 
-/* ===== PRIX (plus petit, gris, Tvac € petit, décimales en exposant) ===== */
+/* ======================
+   PRIX
+====================== */
+
 .price {
   margin-top: auto;
   padding: 6px 0 2px;
@@ -130,8 +136,6 @@ figcaption {
   font-size: 11px;
   font-weight: 600;
   color: #555;
-  /* gris foncé */
-  line-height: 1;
 }
 
 .price-amount {
@@ -140,8 +144,6 @@ figcaption {
   gap: 4px;
   font-weight: 800;
   color: #333;
-  /* gris foncé (pas noir) */
-  line-height: 1;
 }
 
 .price-amount .int {
@@ -162,6 +164,10 @@ figcaption {
   top: 10px;
 }
 
+/* ======================
+   HEADER
+====================== */
+
 header.top {
   display: flex;
   flex-direction: column;
@@ -174,10 +180,11 @@ header.top {
   margin-top: 12px;
 }
 
+/* ======================
+   VARIABLES CATÉGORIES
+====================== */
+
 :root {
-  --cat-font: 12px;
-  --cat-py: 6px;
-  --cat-px: 10px;
   --cat-gap: 6px;
 }
 
@@ -185,54 +192,97 @@ header.top {
   display: flex;
   gap: var(--cat-gap);
   flex-wrap: nowrap;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  max-width: 100%;
+  overflow-x: auto;
+  padding: 14px 0;
   width: 100%;
+
+  border-top: 1px solid rgba(198, 160, 74, 0.25);
+  border-bottom: 1px solid rgba(158, 124, 50, 0.45);
 }
 
-/* ===== BOUTONS CATEGORIES : LOGO AU-DESSUS DU TEXTE ===== */
-.catBtn {
-  padding: var(--cat-py) var(--cat-px);
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  background: #fff;
-  cursor: pointer;
-  font-size: var(--cat-font);
-  flex: 0 0 auto;
 
-  /* logo au-dessus du texte */
+/* ======================
+   BOUTONS CATÉGORIES
+====================== */
+
+.catBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 
-  /* pour rendre le logo lisible sans faire trop gros */
-  min-height: 92px;
+  padding: 10px 14px;
+  min-height: 130px;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  cursor: pointer;
+  flex: 0 0 auto;
 }
 
+/* CADRE UNIFORME */
 .catBtn .catIcon {
-  width: 46px;
-  height: 46px;
+  width: 72px;
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f6f6f6;
+  border-radius: 50%;
+
+  border: 1.5px solid #c6a04a;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.70) inset,
+    0 1px 2px rgba(255, 255, 255, 0.35),
+    0 1px 4px rgba(158, 124, 50, 0.55);
+}
+
+.catBtn:hover .catIcon {
+  border-color: #d4b05c;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.70) inset,
+    0 2px 6px rgba(158, 124, 50, 0.75);
+}
+
+
+
+/* IMAGE DANS LE CADRE */
+.catBtn .catIcon img {
+  max-width: 80%;
+  max-height: 80%;
   object-fit: contain;
-  flex-shrink: 0;
+  display: block;
 }
 
 .catBtn span {
   font-size: 11px;
+  font-weight: 600;
   text-align: center;
-  line-height: 1.15;
-
-  /* permet de ne pas casser la mise en page tout en autorisant les retours */
-  white-space: normal;
+  line-height: 1.2;
+  color: #222;
+  margin-top: 2px;
 }
 
-.catBtn.active {
-  border-color: #111;
-  font-weight: 700;
+.catBtn.active .catIcon {
+  border-color: #9e7c32;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.70) inset,
+    0 2px 8px rgba(158, 124, 50, 0.9);
 }
+
+.catBtn.active span {
+  color: #000;
+}
+
+
+/* ======================
+   SELECT MOBILE
+====================== */
 
 .catSelect {
   display: none;
@@ -244,6 +294,10 @@ header.top {
   font-size: 14px;
   background: #fff;
 }
+
+/* ======================
+   RESPONSIVE
+====================== */
 
 @media (max-width: 700px) {
   .logo {
